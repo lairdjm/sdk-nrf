@@ -129,6 +129,7 @@ static void validate_and_boot(const struct fw_info *fw_info, counter_t slot)
 int main(void)
 {
 
+#if 0
 #if defined(CONFIG_FPROTECT)
 	int err = fprotect_area(PM_B0_ADDRESS, PM_B0_SIZE);
 
@@ -138,6 +139,7 @@ int main(void)
 	}
 #else
 	printk("Fprotect disabled. No protection applied.\n\r");
+#endif
 #endif
 
 	uint32_t s0_addr = s0_address_read();

@@ -462,6 +462,27 @@ function(${SYSBUILD_CURRENT_MODULE_NAME}_pre_cmake)
       set_config_bool(${DEFAULT_IMAGE} CONFIG_SECURE_BOOT y)
       set_config_bool(${DEFAULT_IMAGE} CONFIG_FW_INFO y)
     endif()
+
+    # Apply configuration for hashing
+    if(SB_CONFIG_SECURE_BOOT_HASH_TYPE_SHA256_HARDWARE)
+      set_config_bool(b0 CONFIG_CONFIG_SB_CRYPTO_CC310_SHA256 y)
+    elseif(SB_CONFIG_SECURE_BOOT_HASH_TYPE_SHA256_SOFTWARE)
+      set_config_bool(b0 CONFIG_CONFIG_SB_CRYPTO_OBERON_SHA256 y)
+    else()
+      set_config_bool(b0 CONFIG_SB_CRYPTO_NO_SHA256 y)
+    endif()
+
+    # Apply configuration for signature
+    if(SB_CONFIG_SECURE_BOOT_SIGNATURE_TYPE_ED25519_HARDWARE)
+      set_config_bool(b0 CONFIG_NRF_SECURITY y)
+      set_config_bool(b0 CONFIG_SB_CRYPTO_PSA_ED25519 y)
+    elseif(SB_CONFIG_SECURE_BOOT_SIGNATURE_TYPE_ECDSA_HARDWARE)
+      set_config_bool(b0 CONFIG_CONFIG_SB_CRYPTO_CC310_ECDSA_SECP256R1 y)
+    elseif(SB_CONFIG_SECURE_BOOT_SIGNATURE_TYPE_ECDSA_SOFTWARE)
+      set_config_bool(b0 CONFIG_CONFIG_SB_CRYPTO_OBERON_ECDSA_SECP256R1 y)
+    else()
+      set_config_bool(b0 CONFIG_SB_CRYPTO_NO_ECDSA_SECP256R1 y)
+    endif()
   endif()
 
   if(SB_CONFIG_SECURE_BOOT_NETCORE)

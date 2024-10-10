@@ -1,0 +1,94 @@
+EMPTY_0:
+  address: 0x164800
+  end_address: 0x165000
+  placement:
+    after:
+    - s1_image
+  region: flash_primary
+  size: 0x800
+app:
+  address: 0x10800
+  end_address: 0xb6000
+  region: flash_primary
+  size: 0xa5800
+app_image:
+  address: 0x10800
+  end_address: 0xb6000
+  orig_span: &id001
+  - app
+  region: flash_primary
+  size: 0xa5800
+  span: *id001
+b0:
+  address: 0x0
+  end_address: 0x10800
+  placement:
+    after:
+    - start
+  region: flash_primary
+  size: 0x10800
+b0_container:
+  address: 0x0
+  end_address: 0x10800
+  orig_span: &id002
+  - b0
+  region: flash_primary
+  size: 0x10800
+  span: *id002
+otp:
+  address: 0xffd780
+  end_address: 0xffd9fc
+  region: otp
+  size: 0x27c
+provision:
+  address: 0xffd500
+  end_address: 0xffd780
+  region: otp
+  size: 0x280
+s0:
+  address: 0x10800
+  end_address: 0xb6000
+  orig_span: &id003
+  - app
+  region: flash_primary
+  size: 0xa5800
+  span: *id003
+s0_image:
+  address: 0x10800
+  end_address: 0xb6000
+  orig_span: &id004
+  - app
+  region: flash_primary
+  sharers: 0x1
+  size: 0xa5800
+  span: *id004
+s1:
+  address: 0xb6000
+  end_address: 0x164800
+  orig_span: &id005
+  - s1_image
+  region: flash_primary
+  size: 0xa5800
+  span: *id005
+s1_image:
+  address: 0xb6000
+  end_address: 0x15b800
+  placement:
+    after:
+    - s0
+    align:
+      start: 0x1000
+    align_next: 0x1000
+  region: flash_primary
+  share_size:
+  - s0_image
+  size: 0xa5800
+DO_NAUT_USE1:
+  address: 0x15b800
+  end_address: 0x164800
+  size: 0x9000
+sram_primary:
+  address: 0x20000000
+  end_address: 0x2002f000
+  region: sram_primary
+  size: 0x2f000
