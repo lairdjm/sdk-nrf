@@ -182,9 +182,6 @@ typedef int (*bl_sha256_verify_t)(const uint8_t *data, uint32_t data_len,
  */
 int bl_sha512_init(bl_sha512_ctx_t *ctx);
 
-/* Typedef for use in EXT_API declaration */
-typedef int (*bl_sha512_init_t)(bl_sha512_ctx_t *ctx);
-
 /**
  * @brief Hash a portion of data.
  *
@@ -203,10 +200,6 @@ typedef int (*bl_sha512_init_t)(bl_sha512_ctx_t *ctx);
  */
 int bl_sha512_update(bl_sha512_ctx_t *ctx, const uint8_t *data, uint32_t data_len);
 
-/* Typedef for use in EXT_API declaration */
-typedef int (*bl_sha512_update_t)(bl_sha512_ctx_t *ctx, const uint8_t *data,
-				uint32_t data_len);
-
 /**
  * @brief Finalize a hash result.
  *
@@ -218,9 +211,6 @@ typedef int (*bl_sha512_update_t)(bl_sha512_ctx_t *ctx, const uint8_t *data,
  * @retval -EINVAL   If @p ctx was NULL or corrupted, or @p output was NULL.
  */
 int bl_sha512_finalize(bl_sha512_ctx_t *ctx, uint8_t *output);
-
-/* Typedef for use in EXT_API declaration */
-typedef int (*bl_sha512_finalize_t)(bl_sha512_ctx_t *ctx, uint8_t *output);
 
 /**
  * @brief Calculate a digest and verify it directly.
@@ -236,10 +226,6 @@ typedef int (*bl_sha512_finalize_t)(bl_sha512_ctx_t *ctx, uint8_t *output);
  *         @ref bl_sha256_finalize if something else went wrong.
  */
 int bl_sha512_verify(const uint8_t *data, uint32_t data_len, const uint8_t *expected);
-
-/* Typedef for use in EXT_API declaration */
-typedef int (*bl_sha512_verify_t)(const uint8_t *data, uint32_t data_len,
-				const uint8_t *expected);
 
 /**
  * @brief Validate a secp256r1 signature.
@@ -284,14 +270,6 @@ int bl_ed25519_validate(const uint8_t *hash,
 			  const uint8_t *signature,
 			  const uint8_t *public_key);
 
-/* Typedef for use in EXT_API declaration */
-typedef int (*bl_ed25519_validate_t)(
-			  const uint8_t *hash,
-			  uint32_t hash_len,
-			  const uint8_t *signature,
-			  const uint8_t *public_key);
-
-
 /**
  * @brief Structure describing the BL_ROT_VERIFY EXT_API.
  */
@@ -315,24 +293,6 @@ struct bl_sha256_ext_api {
  */
 struct bl_secp256r1_ext_api {
 	bl_secp256r1_validate_t bl_secp256r1_validate;
-};
-
-/**
- * @brief Structure describing the BL_SHA512 EXT_API.
- */
-struct bl_sha512_ext_api {
-	bl_sha512_init_t bl_sha512_init;
-	bl_sha512_update_t bl_sha512_update;
-	bl_sha512_finalize_t bl_sha512_finalize;
-	bl_sha512_verify_t bl_sha512_verify;
-	uint32_t bl_sha512_ctx_size;
-};
-
-/**
- * @brief Structure describing the BL_ED25519 EXT_API.
- */
-struct bl_ed25519_ext_api {
-	bl_ed25519_validate_t bl_ed25519_validate;
 };
 
   /** @} */

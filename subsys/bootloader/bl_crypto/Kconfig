@@ -151,16 +151,4 @@ flags = 1
 ver = 1
 source "${ZEPHYR_BASE}/../nrf/subsys/fw_info/Kconfig.template.fw_info_ext_api"
 
-EXT_API = BL_SHA512
-id = 0x1004
-flags = 0
-ver = 1
-source "${ZEPHYR_BASE}/../nrf/subsys/fw_info/Kconfig.template.fw_info_ext_api"
-
-EXT_API = BL_ED25519
-id = 0x1005
-flags = 1
-ver = 1
-source "${ZEPHYR_BASE}/../nrf/subsys/fw_info/Kconfig.template.fw_info_ext_api"
-
 endif # SECURE_BOOT_CRYPTO

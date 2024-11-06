@@ -110,47 +110,4 @@ int bl_root_of_trust_verify(const uint8_t *public_key, const uint8_t *public_key
 	return root_of_trust_verify(public_key, public_key_hash, signature,
 					firmware, firmware_len, false);
 }
-
-
-/* For use through EXT_API. */
-int bl_root_of_trust_verify_external(
-			const uint8_t *public_key, const uint8_t *public_key_hash,
-			const uint8_t *signature, const uint8_t *firmware,
-			const uint32_t firmware_len)
-{
-	return root_of_trust_verify(public_key, public_key_hash, signature,
-					firmware, firmware_len, true);
-}
-#endif
-
-#ifndef CONFIG_BL_SHA512_EXT_API_REQUIRED
-int bl_sha512_verify(const uint8_t *data, uint32_t data_len, const uint8_t *expected)
-{
-	return verify_truncated_hash(data, data_len, expected, CONFIG_SB_HASH_LEN, true);
-}
-#endif
-
-#ifdef CONFIG_BL_ROT_VERIFY_EXT_API_ENABLED
-EXT_API(BL_ROT_VERIFY, struct bl_rot_verify_ext_api, bl_rot_verify_ext_api) = {
-		.bl_root_of_trust_verify = bl_root_of_trust_verify_external,
-	}
-};
-#endif
-
-#ifdef CONFIG_BL_SHA512_EXT_API_ENABLED
-EXT_API(BL_SHA512, struct bl_sha512_ext_api, bl_sha512_ext_api) = {
-		.bl_sha512_init = bl_sha512_init,
-		.bl_sha512_update = bl_sha512_update,
-		.bl_sha512_finalize = bl_sha512_finalize,
-//		.bl_sha512_verify = bl_sha512_verify,
-		.bl_sha512_ctx_size = SHA512_CTX_SIZE,
-	}
-};
-#endif
-
-#ifdef CONFIG_BL_ED25519_EXT_API_ENABLED
-EXT_API(BL_ED25519, struct bl_ed25519_ext_api, bl_ed25519_ext_api) = {
-		.bl_ed25519_validate = bl_ed25519_validate,
-	}
-};
 #endif
