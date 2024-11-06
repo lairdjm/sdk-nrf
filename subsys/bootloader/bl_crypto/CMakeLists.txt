@@ -21,7 +21,7 @@ elseif(CONFIG_SB_CRYPTO_CLIENT_ECDSA_SECP256R1)
 elseif(CONFIG_SB_CRYPTO_NO_ECDSA_SECP256R1)
   # Do nothing
 elseif(CONFIG_SB_CRYPTO_PSA_ED25519)
-#todo
+  zephyr_library_sources(bl_crypto_ed25519.c)
 else()
   message(FATAL_ERROR "No signature implementation chosen for bootloader.")
 endif()

@@ -68,7 +68,7 @@ static int verify_signature(const uint8_t *data, uint32_t data_len,
 #if defined(CONFIG_SB_ECDSA_SECP256R1)
 	return bl_secp256r1_validate(hash2, CONFIG_SB_HASH_LEN, public_key, signature);
 #elif defined(CONFIG_SB_ED25519)
-return -1;
+	return bl_ed25519_validate(hash2, CONFIG_SB_HASH_LEN, public_key, signature);
 #else
 #error "Unsupported signature type selected"
 #endif
