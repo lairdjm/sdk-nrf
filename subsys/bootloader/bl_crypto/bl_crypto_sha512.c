@@ -10,10 +10,6 @@
 #include <fw_info.h>
 #include <psa/crypto.h>
 
-int bl_crypto_init(void)
-{
-}
-
 int bl_sha512_init(bl_sha512_ctx_t * const ctx)
 {
 	*ctx = psa_hash_operation_init();
@@ -34,6 +30,23 @@ int bl_sha512_finalize(bl_sha512_ctx_t *ctx, uint8_t *output)
 
 int get_hash(uint8_t *hash, const uint8_t *data, uint32_t data_len, bool external)
 {
+	bl_sha512_ctx_t ctx;
+	int rc;
+
+	rc = bl_sha512_init(&ctx);
+
+	if (rc != 0) {
+		return rc;
+	}
+
+	rc = bl_sha512_update(&ctx, data, data_len);
+
+	if (rc != 0) {
+		return rc;
+	}
+
+	rc = bl_sha512_finalize(&ctx, hash);
+	return rc;
 }
 
 #if 0
@@ -42,72 +55,66 @@ int get_hash(uint8_t *hash, const uint8_t *data, uint32_t data_len, bool externa
 #include <ocrypto_constant_time.h>
 #include "bl_crypto_internal.h"
 
-static int verify_truncated_hash(const uint8_t *data, uint32_t data_len,
-		const uint8_t *expected, uint32_t hash_len, bool external)
+static int verify_truncated_hash(const uint8_t *data, uint32_t data_len, const uint8_t *expected,
+				 uint32_t hash_len)
 {
 	uint8_t hash[CONFIG_SB_HASH_LEN];
+	int rc;
 
-	int retval = get_hash(hash, data, data_len, external);
-	if (retval != 0) {
-		return retval;
-	}
-	if (!ocrypto_constant_time_equal(expected, hash, hash_len)) {
+	rc = get_hash(hash, data, data_len, false);
+
+	if (rc != 0) {
+		return rc;
+	} else if (!ocrypto_constant_time_equal(expected, hash, hash_len)) {
 		return -EHASHINV;
 	}
+
 	return 0;
 }
 
-static int verify_signature(const uint8_t *data, uint32_t data_len,
-		const uint8_t *signature, const uint8_t *public_key, bool external)
+static int verify_signature(const uint8_t *data, uint32_t data_len, const uint8_t *signature,
+			    const uint8_t *public_key)
 {
 	uint8_t hash1[CONFIG_SB_HASH_LEN];
 	uint8_t hash2[CONFIG_SB_HASH_LEN];
+	int rc;
 
-	int retval = get_hash(hash1, data, data_len, external);
-	if (retval != 0) {
-		return retval;
+	rc = get_hash(hash1, data, data_len, false);
+
+	if (rc != 0) {
+		return rc;
 	}
 
-	retval = get_hash(hash2, hash1, CONFIG_SB_HASH_LEN, external);
-	if (retval != 0) {
-		return retval;
+	rc = get_hash(hash2, hash1, CONFIG_SB_HASH_LEN, false);
+
+	if (rc != 0) {
+		return rc;
 	}
 
 	return bl_secp256r1_validate(hash2, CONFIG_SB_HASH_LEN, public_key, signature);
 }
 
 /* Base implementation, with 'external' parameter. */
-static int root_of_trust_verify(
-		const uint8_t *public_key, const uint8_t *public_key_hash,
-		const uint8_t *signature, const uint8_t *firmware,
-		const uint32_t firmware_len, bool external)
-{
-	__ASSERT(public_key && public_key_hash && signature && firmware,
-			"A parameter was NULL.");
-	int retval = verify_truncated_hash(public_key, CONFIG_SB_PUBLIC_KEY_LEN,
-			public_key_hash, SB_PUBLIC_KEY_HASH_LEN, external);
-
-	if (retval != 0) {
-		return retval;
-	}
-
-	return verify_signature(firmware, firmware_len, signature, public_key,
-			external);
-}
-#endif
-
-int root_of_trust_verify(
-		const uint8_t *public_key, const uint8_t *public_key_hash,
-		const uint8_t *signature, const uint8_t *firmware,
-		const uint32_t firmware_len, bool external);
-
+//int root_of_trust_verify(
+//		const uint8_t *public_key, const uint8_t *public_key_hash,
+//		const uint8_t *signature, const uint8_t *firmware,
+//		const uint32_t firmware_len, bool external);
 
 /* For use by the bootloader. */
 int bl_root_of_trust_verify(const uint8_t *public_key, const uint8_t *public_key_hash,
-			 const uint8_t *signature, const uint8_t *firmware,
-			 const uint32_t firmware_len)
+			    const uint8_t *signature, const uint8_t *firmware,
+			    const uint32_t firmware_len)
 {
-	return root_of_trust_verify(public_key, public_key_hash, signature,
-					firmware, firmware_len, false);
+	__ASSERT(public_key && public_key_hash && signature && firmware,
+			"A parameter was NULL.");
+	int rc = verify_truncated_hash(public_key, CONFIG_SB_PUBLIC_KEY_LEN, public_key_hash,
+					   SB_PUBLIC_KEY_HASH_LEN);
+
+	if (rc != 0) {
+		return rc;
+	}
+
+	return verify_signature(firmware, firmware_len, signature, public_key);
 }
+#endif
 #endif

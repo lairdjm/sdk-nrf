@@ -13,7 +13,10 @@ extern "C" {
 
 #include <zephyr/types.h>
 #include <fw_info.h>
-
+#if defined(CONFIG_NRF_SECURITY)
+#include <psa/crypto.h>
+#include <psa/crypto_extra.h>
+#endif
 
 /** @defgroup bl_crypto Bootloader crypto functions
  * @{

@@ -65,7 +65,13 @@ static int verify_signature(const uint8_t *data, uint32_t data_len,
 		return retval;
 	}
 
+#if defined(CONFIG_SB_ECDSA_SECP256R1)
 	return bl_secp256r1_validate(hash2, CONFIG_SB_HASH_LEN, public_key, signature);
+#elif defined(CONFIG_SB_ED25519)
+return -1;
+#else
+#error "Unsupported signature type selected"
+#endif
 }
 
 /* Base implementation, with 'external' parameter. */
