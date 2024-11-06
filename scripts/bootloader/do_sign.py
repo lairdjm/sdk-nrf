@@ -35,5 +35,5 @@ if __name__ == '__main__':
     args = parse_args()
     private_key = SigningKey.from_pem(args.private_key.read())
     data = args.infile.read()
-    signature = private_key.sign(data, hashfunc=hashlib.sha256)
+    signature = private_key.sign(data, hashfunc=hashlib.sha512)
     args.outfile.write(signature)

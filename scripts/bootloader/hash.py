@@ -33,4 +33,4 @@ if __name__ == '__main__':
         to_hash = ih.tobinstr()
     else:
         to_hash = open(args.infile, 'rb').read()
-    sys.stdout.buffer.write(hashlib.sha256(to_hash).digest())
+    sys.stdout.buffer.write(hashlib.sha512(to_hash).digest())
