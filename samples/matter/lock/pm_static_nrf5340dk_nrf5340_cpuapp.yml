@@ -1,27 +1,27 @@
 mcuboot:
   address: 0x0
-  size: 0x8000
+  size: 0x10000
   region: flash_primary
 mcuboot_pad:
-  address: 0x8000
+  address: 0x10000
   size: 0x200
 app:
-  address: 0x8200
-  size: 0xeee00
+  address: 0x10200
+  size: 0xe6e00
 mcuboot_primary:
   orig_span: &id001
   - mcuboot_pad
   - app
   span: *id001
-  address: 0x8000
-  size: 0xef000
+  address: 0x10000
+  size: 0xe7000
   region: flash_primary
 mcuboot_primary_app:
   orig_span: &id002
   - app
   span: *id002
-  address: 0x8200
-  size: 0xeee00
+  address: 0x10200
+  size: 0xe6e00
 factory_data:
   address: 0xf7000
   size: 0x1000
@@ -37,17 +37,17 @@ mcuboot_primary_1:
   region: ram_flash
 mcuboot_secondary:
   address: 0x0
-  size: 0xef000
+  size: 0xe6000
   device: MX25R64
   region: external_flash
 mcuboot_secondary_1:
-  address: 0xef000
+  address: 0xe6000
   size: 0x40000
   device: MX25R64
   region: external_flash
 external_flash:
-  address: 0x12F000
-  size: 0x6D1000
+  address: 0x126000
+  size: 0x6Da000
   device: MX25R64
   region: external_flash
 pcd_sram:

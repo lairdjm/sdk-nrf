@@ -38,28 +38,31 @@ config DFU_MULTI_IMAGE_PACKAGE_APP
 config PM_EXTERNAL_FLASH_MCUBOOT_SECONDARY
 	default y
 
+config MCUBOOT_COMPRESSED_IMAGE_SUPPORT
+	default y
+
 #### DFU network core configuration
 if SOC_SERIES_NRF53X
 
 config MCUBOOT_UPDATEABLE_IMAGES
-	default 2
+	default 1
 
 choice MCUBOOT_MODE
 	default MCUBOOT_MODE_OVERWRITE_ONLY
 endchoice
 
 choice BOOT_SIGNATURE_TYPE
-	default BOOT_SIGNATURE_TYPE_RSA
+	default BOOT_SIGNATURE_TYPE_ECDSA_P256
 endchoice
 
 config SECURE_BOOT_NETCORE
 	default y
 
-config NETCORE_APP_UPDATE
-	default y
+#config NETCORE_APP_UPDATE
+#	default y
 
-config DFU_MULTI_IMAGE_PACKAGE_NET
-	default y
+#config DFU_MULTI_IMAGE_PACKAGE_NET
+#	default y
 
 endif # SOC_SERIES_NRF53X
 
