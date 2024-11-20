@@ -161,7 +161,7 @@ function(b0_sign_image slot)
 
   if(SB_CONFIG_SECURE_BOOT_SIGNING_PYTHON)
     if(SB_CONFIG_SECURE_BOOT_SIGNATURE_TYPE_ED25519)
-      set(sign_cmd_signature_type --alg ed25519)
+      set(sign_cmd_signature_type --signing ed25519)
     else()
       set(sign_cmd_signature_type)
     endif()
