@@ -9,7 +9,6 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.serialization import load_pem_private_key as load_pem
 from hashlib import sha256
-from hashlib import sha512
 import argparse
 import sys
 
@@ -30,7 +29,7 @@ def generate_legal_key():
 
         # The digest don't contain the first byte as it denotes
         # if it is compressed/UncompressedPoint.
-        digest = sha512(public_bytes[1:]).digest()[:16]
+        digest = sha256(public_bytes[1:]).digest()[:16]
         if not (any([digest[n:n + 2] == b'\xff\xff'
                      for n in range(0, len(digest), 2)])):
             return key

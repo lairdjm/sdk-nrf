@@ -11,7 +11,6 @@ import argparse
 import struct
 from ecdsa import VerifyingKey
 from hashlib import sha256
-from hashlib import sha512
 import os
 
 # Size of implementation ID in OTP in bytes
@@ -140,7 +139,7 @@ def get_hashes(public_key_files, verify_hashes):
     hashes = list()
     for fn in public_key_files:
         with open(fn, 'rb') as f:
-            digest = sha512(VerifyingKey.from_pem(f.read()).to_string()).digest()[:16]
+            digest = sha256(VerifyingKey.from_pem(f.read()).to_string()).digest()[:16]
             if verify_hashes and any([digest[n:n+2] == b'\xff\xff' for n in range(0, len(digest), 2)]):
                 raise RuntimeError("Hash of key in '%s' contains 0xffff. Please regenerate the key." %
                                    os.path.abspath(f.name))

@@ -15,7 +15,7 @@ import ecdsa
 
 def get_hash(input_hex):
     firmware_bytes = input_hex.tobinstr()
-    return hashlib.sha512(firmware_bytes).digest()
+    return hashlib.sha256(firmware_bytes).digest()
 
 
 def get_validation_data(signature_bytes, input_hex, public_key, magic_value):
@@ -23,7 +23,7 @@ def get_validation_data(signature_bytes, input_hex, public_key, magic_value):
     public_key_bytes = public_key.to_string()
 
     # Will raise an exception if it fails
-    public_key.verify(signature_bytes, hash_bytes, hashfunc=hashlib.sha512)
+    public_key.verify(signature_bytes, hash_bytes, hashfunc=hashlib.sha256)
 
     validation_bytes = magic_value
     validation_bytes += struct.pack('I', input_hex.addresses()[0])
