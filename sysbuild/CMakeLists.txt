@@ -462,6 +462,18 @@ function(${SYSBUILD_CURRENT_MODULE_NAME}_pre_cmake)
       set_config_bool(${DEFAULT_IMAGE} CONFIG_SECURE_BOOT y)
       set_config_bool(${DEFAULT_IMAGE} CONFIG_FW_INFO y)
     endif()
+
+    if(SB_CONFIG_SECURE_BOOT_SIGNATURE_TYPE_ED25519 OR SB_CONFIG_SECURE_BOOT_HASH_TYPE_SHA512)
+      set_config_bool(b0 CONFIG_NRF_SECURITY y)
+
+      if(SB_CONFIG_SECURE_BOOT_SIGNATURE_TYPE_ED25519)
+        set_config_bool(b0 CONFIG_SB_CRYPTO_PSA_ED25519 y)
+      endif()
+
+      if(SB_CONFIG_SECURE_BOOT_HASH_TYPE_SHA512)
+        set_config_bool(b0 CONFIG_SB_CRYPTO_PSA_SHA512 y)
+      endif()
+    endif()
   endif()
 
   if(SB_CONFIG_SECURE_BOOT_NETCORE)

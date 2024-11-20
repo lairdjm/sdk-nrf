@@ -14,15 +14,22 @@ function(b0_gen_keys)
   set(SIGNATURE_PUBLIC_KEY_FILE ${GENERATED_PATH}/public.pem)
   set(SIGNATURE_PUBLIC_KEY_FILE ${GENERATED_PATH}/public.pem PARENT_SCOPE)
 
+  if(SB_CONFIG_SECURE_BOOT_SIGNATURE_TYPE_ED25519)
+    set(keygen_algorithm --algorithm ed25519)
+  else()
+    set(keygen_algorithm)
+  endif()
+
   if(SB_CONFIG_SECURE_BOOT_SIGNING_PYTHON)
     set(PUB_GEN_CMD
       ${PYTHON_EXECUTABLE}
       ${ZEPHYR_NRF_MODULE_DIR}/scripts/bootloader/keygen.py
-      --public
+      --public ${keygen_algorithm}
       --in ${SIGNATURE_PRIVATE_KEY_FILE}
       --out ${SIGNATURE_PUBLIC_KEY_FILE}
       )
   elseif(SB_CONFIG_SECURE_BOOT_SIGNING_OPENSSL)
+#below?
     set(PUB_GEN_CMD
       openssl ec
       -pubout
@@ -134,32 +141,52 @@ function(b0_sign_image slot)
   endif()
 
   set(to_sign ${slot_hex})
-  set(hash_file ${GENERATED_PATH}/${slot}_firmware.sha256)
+  if(SB_CONFIG_SECURE_BOOT_HASH_TYPE_SHA512)
+    set(hash_file ${GENERATED_PATH}/${slot}_firmware.sha512)
+    set(hash_cmd_type --type sha512)
+    set(sign_cmd_hash_type sha512)
+  else()
+    set(hash_file ${GENERATED_PATH}/${slot}_firmware.sha256)
+    set(hash_cmd_type)
+    set(sign_cmd_hash_type sha256)
+  endif()
   set(signature_file ${GENERATED_PATH}/${slot}_firmware.signature)
 
   set(hash_cmd
     ${PYTHON_EXECUTABLE}
     ${ZEPHYR_NRF_MODULE_DIR}/scripts/bootloader/hash.py
-    --in ${to_sign}
+    --in ${to_sign} ${hash_cmd_type}
     > ${hash_file}
     )
 
   if(SB_CONFIG_SECURE_BOOT_SIGNING_PYTHON)
+    if(SB_CONFIG_SECURE_BOOT_SIGNATURE_TYPE_ED25519)
+      set(sign_cmd_signature_type --alg ed25519)
+    else()
+      set(sign_cmd_signature_type)
+    endif()
+
     set(sign_cmd
       ${PYTHON_EXECUTABLE}
       ${ZEPHYR_NRF_MODULE_DIR}/scripts/bootloader/do_sign.py
       --private-key ${SIGNATURE_PRIVATE_KEY_FILE}
-      --in ${hash_file}
+      --in ${hash_file} ${sign_cmd_signature_type}
       > ${signature_file}
       )
   elseif(SB_CONFIG_SECURE_BOOT_SIGNING_OPENSSL)
+    if(SB_CONFIG_SECURE_BOOT_SIGNATURE_TYPE_ED25519)
+      set(sign_cmd_signature_type ed25519)
+    else()
+      set(sign_cmd_signature_type ecdsa)
+    endif()
+
     set(sign_cmd
       openssl dgst
-      -sha256
+      -${sign_cmd_hash_type}
       -sign ${SIGNATURE_PRIVATE_KEY_FILE} ${hash_file} |
       ${PYTHON_EXECUTABLE}
       ${ZEPHYR_NRF_MODULE_DIR}/scripts/bootloader/asn1parse.py
-      --alg ecdsa
+      --alg ${sign_cmd_signature_type}
       --contents signature
       > ${signature_file}
       )
