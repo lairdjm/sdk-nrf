@@ -231,6 +231,12 @@ function(b0_sign_image slot)
   cmake_path(GET to_sign FILENAME to_sign_filename)
   set(validation_comment "Creating validation for ${to_sign_filename}, storing to ${signed_hex_filename}")
 
+  if(SB_CONFIG_SECURE_BOOT_SIGNATURE_TYPE_ED25519)
+    set(validation_signature_cmd --algorythm ed25519)
+  else()
+    set(validation_signature_cmd)
+  endif()
+
   add_custom_command(
     OUTPUT
     ${signed_hex}
@@ -238,7 +244,7 @@ function(b0_sign_image slot)
     COMMAND
     ${PYTHON_EXECUTABLE}
     ${ZEPHYR_NRF_MODULE_DIR}/scripts/bootloader/validation_data.py
-    --input ${to_sign}
+    --input ${to_sign} ${validation_signature_cmd}
     --output-hex ${signed_hex}
     --output-bin ${signed_bin}
     --offset ${${slot}_validation_offset}
