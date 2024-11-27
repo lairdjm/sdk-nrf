@@ -34,6 +34,7 @@ int bl_crypto_init(void)
 #include <ocrypto_constant_time.h>
 #include "bl_crypto_internal.h"
 
+#if !defined(CONFIG_SB_ED25519)
 static int verify_truncated_hash(const uint8_t *data, uint32_t data_len,
 		const uint8_t *expected, uint32_t hash_len, bool external)
 {
@@ -43,32 +44,36 @@ static int verify_truncated_hash(const uint8_t *data, uint32_t data_len,
 	if (retval != 0) {
 		return retval;
 	}
+
 	if (!ocrypto_constant_time_equal(expected, hash, hash_len)) {
 		return -EHASHINV;
 	}
 	return 0;
 }
+#endif
 
 static int verify_signature(const uint8_t *data, uint32_t data_len,
 		const uint8_t *signature, const uint8_t *public_key, bool external)
 {
 	uint8_t hash1[CONFIG_SB_HASH_LEN];
+#if defined(CONFIG_SB_ECDSA_SECP256R1)
 	uint8_t hash2[CONFIG_SB_HASH_LEN];
+#endif
 
 	int retval = get_hash(hash1, data, data_len, external);
 	if (retval != 0) {
 		return retval;
 	}
 
+#if defined(CONFIG_SB_ECDSA_SECP256R1)
 	retval = get_hash(hash2, hash1, CONFIG_SB_HASH_LEN, external);
 	if (retval != 0) {
 		return retval;
 	}
 
-#if defined(CONFIG_SB_ECDSA_SECP256R1)
 	return bl_secp256r1_validate(hash2, CONFIG_SB_HASH_LEN, public_key, signature);
 #elif defined(CONFIG_SB_ED25519)
-	return bl_ed25519_validate(hash2, CONFIG_SB_HASH_LEN, public_key, signature);
+	return bl_ed25519_validate(hash1, CONFIG_SB_HASH_LEN, public_key, signature);
 #else
 #error "Unsupported signature type selected"
 #endif
@@ -82,12 +87,14 @@ static int root_of_trust_verify(
 {
 	__ASSERT(public_key && public_key_hash && signature && firmware,
 			"A parameter was NULL.");
+#if !defined(CONFIG_SB_ED25519)
 	int retval = verify_truncated_hash(public_key, CONFIG_SB_PUBLIC_KEY_LEN,
 			public_key_hash, SB_PUBLIC_KEY_HASH_LEN, external);
 
 	if (retval != 0) {
 		return retval;
 	}
+#endif
 
 	return verify_signature(firmware, firmware_len, signature, public_key,
 			external);
