@@ -111,6 +111,7 @@ function(b0_sign_image slot)
       sysbuild_get(${slot}_crypto_id IMAGE ${slot} VAR CONFIG_SB_VALIDATION_INFO_CRYPTO_ID KCONFIG)
       sysbuild_get(${slot}_validation_offset IMAGE ${slot} VAR CONFIG_SB_VALIDATION_METADATA_OFFSET KCONFIG)
 
+      set(slot_bin ${${slot}_image_dir}/zephyr/${${slot}_kernel_name}.bin)
       set(slot_hex ${${slot}_image_dir}/zephyr/${${slot}_kernel_name}.hex)
       set(sign_depends ${${slot}_image_dir}/zephyr/${${slot}_kernel_name}.elf)
       set(target_name ${slot})
@@ -126,6 +127,7 @@ function(b0_sign_image slot)
       sysbuild_get(${slot}_crypto_id IMAGE ${target_name} VAR CONFIG_SB_VALIDATION_INFO_CRYPTO_ID KCONFIG)
       sysbuild_get(${slot}_validation_offset IMAGE ${target_name} VAR CONFIG_SB_VALIDATION_METADATA_OFFSET KCONFIG)
 
+      set(slot_bin ${${target_name}_image_dir}/zephyr/${${target_name}_kernel_name}.bin)
       set(slot_hex ${${target_name}_image_dir}/zephyr/${${target_name}_kernel_name}.hex)
       set(sign_depends ${target_name} ${${target_name}_image_dir}/zephyr/${${target_name}_kernel_name}.elf)
     else()
@@ -140,24 +142,30 @@ function(b0_sign_image slot)
       "This value of SB_VALIDATION_INFO_CRYPTO_ID is not supported")
   endif()
 
-  set(to_sign ${slot_hex})
+  set(signature_file ${GENERATED_PATH}/${slot}_firmware.signature)
+
   if(SB_CONFIG_SECURE_BOOT_HASH_TYPE_SHA512)
     set(hash_file ${GENERATED_PATH}/${slot}_firmware.sha512)
     set(hash_cmd_type --type sha512)
     set(sign_cmd_hash_type sha512)
-  else()
+  elseif(SB_CONFIG_SECURE_BOOT_HASH_TYPE_SHA256)
     set(hash_file ${GENERATED_PATH}/${slot}_firmware.sha256)
     set(hash_cmd_type)
     set(sign_cmd_hash_type sha256)
+  else()
+    set(hash_file ${slot_bin})
+    set(to_sign ${slot_hex})
   endif()
-  set(signature_file ${GENERATED_PATH}/${slot}_firmware.signature)
 
-  set(hash_cmd
-    ${PYTHON_EXECUTABLE}
-    ${ZEPHYR_NRF_MODULE_DIR}/scripts/bootloader/hash.py
-    --in ${to_sign} ${hash_cmd_type}
-    > ${hash_file}
-    )
+  if(sign_cmd_hash_type)
+    set(to_sign ${slot_hex})
+    set(hash_cmd
+      ${PYTHON_EXECUTABLE}
+      ${ZEPHYR_NRF_MODULE_DIR}/scripts/bootloader/hash.py
+      --in ${to_sign} ${hash_cmd_type}
+      > ${hash_file}
+      )
+  endif()
 
   if(SB_CONFIG_SECURE_BOOT_SIGNING_PYTHON)
     if(SB_CONFIG_SECURE_BOOT_SIGNATURE_TYPE_ED25519)
@@ -204,22 +212,39 @@ function(b0_sign_image slot)
     message(WARNING "Unable to parse signing config.")
   endif()
 
-  add_custom_command(
-    OUTPUT
-    ${signature_file}
-    COMMAND
-    ${hash_cmd}
-    COMMAND
-    ${sign_cmd}
-    DEPENDS
-    ${sign_depends}
-    WORKING_DIRECTORY
-    ${PROJECT_BINARY_DIR}
-    COMMENT
-    "Creating signature of application"
-    USES_TERMINAL
-    COMMAND_EXPAND_LISTS
-    )
+  if(sign_cmd_hash_type)
+    add_custom_command(
+      OUTPUT
+      ${signature_file}
+      COMMAND
+      ${hash_cmd}
+      COMMAND
+      ${sign_cmd}
+      DEPENDS
+      ${sign_depends}
+      WORKING_DIRECTORY
+      ${PROJECT_BINARY_DIR}
+      COMMENT
+      "Creating signature of application"
+      USES_TERMINAL
+      COMMAND_EXPAND_LISTS
+      )
+  else()
+    add_custom_command(
+      OUTPUT
+      ${signature_file}
+      COMMAND
+      ${sign_cmd}
+      DEPENDS
+      ${sign_depends}
+      WORKING_DIRECTORY
+      ${PROJECT_BINARY_DIR}
+      COMMENT
+      "Creating signature of application"
+      USES_TERMINAL
+      COMMAND_EXPAND_LISTS
+      )
+  endif()
 
   add_custom_target(
     ${slot}_signature_file_target
