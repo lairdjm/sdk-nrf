@@ -85,15 +85,18 @@ static int root_of_trust_verify(
 		const uint8_t *signature, const uint8_t *firmware,
 		const uint32_t firmware_len, bool external)
 {
-	__ASSERT(public_key && public_key_hash && signature && firmware,
-			"A parameter was NULL.");
 #if !defined(CONFIG_SB_ED25519)
+	__ASSERT(public_key && public_key_hash && signature && firmware,
+		 "A parameter was NULL.");
+
 	int retval = verify_truncated_hash(public_key, CONFIG_SB_PUBLIC_KEY_LEN,
 			public_key_hash, SB_PUBLIC_KEY_HASH_LEN, external);
 
 	if (retval != 0) {
 		return retval;
 	}
+#else
+	__ASSERT((signature && firmware), "A parameter was NULL.");
 #endif
 
 	return verify_signature(firmware, firmware_len, signature, public_key,
