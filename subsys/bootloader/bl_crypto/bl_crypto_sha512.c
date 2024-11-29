@@ -13,7 +13,7 @@
 int bl_sha512_init(bl_sha512_ctx_t * const ctx)
 {
 	*ctx = psa_hash_operation_init();
-	return (int)psa_hash_setup(ctx, PSA_ALG_SHA_512);;
+	return (int)psa_hash_setup(ctx, PSA_ALG_SHA_512);
 }
 
 int bl_sha512_update(bl_sha512_ctx_t *ctx, const uint8_t *data, uint32_t data_len)

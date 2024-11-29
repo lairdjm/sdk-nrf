@@ -55,17 +55,15 @@ static int verify_truncated_hash(const uint8_t *data, uint32_t data_len,
 static int verify_signature(const uint8_t *data, uint32_t data_len,
 		const uint8_t *signature, const uint8_t *public_key, bool external)
 {
-	uint8_t hash1[CONFIG_SB_HASH_LEN];
 #if defined(CONFIG_SB_ECDSA_SECP256R1)
+	uint8_t hash1[CONFIG_SB_HASH_LEN];
 	uint8_t hash2[CONFIG_SB_HASH_LEN];
-#endif
 
 	int retval = get_hash(hash1, data, data_len, external);
 	if (retval != 0) {
 		return retval;
 	}
 
-#if defined(CONFIG_SB_ECDSA_SECP256R1)
 	retval = get_hash(hash2, hash1, CONFIG_SB_HASH_LEN, external);
 	if (retval != 0) {
 		return retval;
@@ -73,7 +71,7 @@ static int verify_signature(const uint8_t *data, uint32_t data_len,
 
 	return bl_secp256r1_validate(hash2, CONFIG_SB_HASH_LEN, public_key, signature);
 #elif defined(CONFIG_SB_ED25519)
-	return bl_ed25519_validate(hash1, CONFIG_SB_HASH_LEN, public_key, signature);
+	return bl_ed25519_validate(data, data_len, public_key, signature);
 #else
 #error "Unsupported signature type selected"
 #endif
@@ -131,7 +129,8 @@ int bl_root_of_trust_verify_external(
 					firmware, firmware_len, true);
 }
 
-#ifndef CONFIG_BL_SHA256_EXT_API_REQUIRED
+#if !defined(CONFIG_BL_SHA256_EXT_API_REQUIRED) && !defined(CONFIG_SB_CRYPTO_NO_SHA256)
+//!defined(CONFIG_SB_CRYPTO_PSA_ED25519)
 int bl_sha256_verify(const uint8_t *data, uint32_t data_len, const uint8_t *expected)
 {
 	return verify_truncated_hash(data, data_len, expected, CONFIG_SB_HASH_LEN, true);

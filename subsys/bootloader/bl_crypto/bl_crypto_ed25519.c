@@ -10,18 +10,13 @@
 #include "bl_crypto_internal.h"
 #include <psa/crypto.h>
 #include <psa/crypto_types.h>
-//#if defined(CONFIG_BOOT_SIGNATURE_USING_KMU)
-#if 1
 #include <cracen_psa_kmu.h>
-#endif
 
 #define LOG_LEVEL LOG_LEVEL_DBG
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(smp_sample);
 
-//#if defined(CONFIG_BOOT_SIGNATURE_USING_KMU)
-#if 1
-/* List of KMU stored key ids available for MCUboot */
+/* List of KMU stored key ids available for NSIB */
 #define MAKE_PSA_KMU_KEY_ID(id) PSA_KEY_HANDLE_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW, id)
 
 static psa_key_id_t kmu_key_ids[] =  {
@@ -31,15 +26,14 @@ static psa_key_id_t kmu_key_ids[] =  {
 };
 
 #define KMU_KEY_COUNT (sizeof(kmu_key_ids)/sizeof(kmu_key_ids[0]))
-#endif
 
-int bl_ed25519_validate(const uint8_t *hash, uint32_t hash_len, const uint8_t *public_key,
+int bl_ed25519_validate(const uint8_t *data, uint32_t data_len, const uint8_t *public_key,
 			const uint8_t *signature)
 {
 	ARG_UNUSED(public_key);
 	psa_status_t status = PSA_ERROR_BAD_STATE;
 
-	if (!hash || (hash_len != CONFIG_SB_HASH_LEN) || ! signature) {
+	if (!data || (data_len == 0) || public_key || !signature) {
 LOG_ERR("e1");
 		return -EINVAL;
 	}
@@ -59,7 +53,7 @@ LOG_ERR("e2");
 		psa_key_id_t kid = kmu_key_ids[i];
 
 LOG_ERR("check key %d", i);
-		status = psa_verify_message(kid, PSA_ALG_PURE_EDDSA, hash, hash_len, signature,
+		status = psa_verify_message(kid, PSA_ALG_PURE_EDDSA, data, data_len, signature,
 					    CONFIG_SB_SIGNATURE_LEN);
 
 LOG_ERR(" = %d", status);
