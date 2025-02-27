@@ -10,6 +10,13 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(mcuboot_update)
 
 # This project uses orginal sdk-zephyr C source code
-target_sources(app PRIVATE src/hook.c ${ZEPHYR_BASE}/samples/subsys/mgmt/mcumgr/smp_svr/src/main.c)
-target_sources_ifdef(CONFIG_MCUMGR_TRANSPORT_BT app PRIVATE ${ZEPHYR_BASE}/samples/subsys/mgmt/mcumgr/smp_svr/src/bluetooth.c)
-zephyr_link_libraries(MCUBOOT_BOOTUTIL)
+target_sources(app PRIVATE src/main.c)
+#zephyr_link_libraries(MCUBOOT_BOOTUTIL)
+
+set(gen_dir ${ZEPHYR_BINARY_DIR}/include/generated/)
+
+  generate_inc_file_for_target(
+    app
+    /tmp/lol.bin
+    ${gen_dir}/lol.inc
+    )
