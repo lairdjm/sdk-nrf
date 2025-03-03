@@ -9,6 +9,7 @@ math(EXPR file_system_partition_size "${SB_CONFIG_FILE_SYSTEM_SIZE}" OUTPUT_FORM
 math(EXPR metadata_partition_size "${SB_CONFIG_METADATA_SIZE}" OUTPUT_FORMAT DECIMAL)
 math(EXPR firmware_loader_partition_size "${SB_CONFIG_FIRMWARE_LOADER_SIZE}" OUTPUT_FORMAT DECIMAL)
 math(EXPR softdevice_partition_size "${SB_CONFIG_SOFTDEVICE_SIZE}" OUTPUT_FORMAT DECIMAL)
+math(EXPR installer_partition_size "${SB_CONFIG_INSTALLER_SIZE}" OUTPUT_FORMAT DECIMAL)
 math(EXPR flash_size "${SB_CONFIG_FLASH_SIZE}" OUTPUT_FORMAT DECIMAL)
 set(flash_size_remaining ${flash_size})
 set(areas)
@@ -49,6 +50,11 @@ endif()
 
 set(app_partition_size ${flash_size_remaining})
 list(APPEND areas app)
+
+if(firmware_loader_partition_size GREATER "0")
+  math(EXPR installer_partition_start "${app_partition_start}")
+  list(APPEND areas installer)
+endif()
 
 set(output)
 foreach(area ${areas})
