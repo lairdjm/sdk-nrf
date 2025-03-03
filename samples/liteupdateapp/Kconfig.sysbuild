@@ -61,4 +61,11 @@ config SOFTDEVICE_SIZE
 	help
 	  Specifies the size of the softdevice partition, set to 0x0 to disable
 
+config INSTALLER_SIZE
+	hex
+	default 0x8000 if FIRMWARE_LOADER_SIZE > 0x0
+	default 0x0
+	help
+	  Specifies the size of the installer image, set to 0x0 to disable
+
 endmenu

@@ -106,7 +106,7 @@ def main():
     checksum = zlib.crc32(metadata_data)
     metadata_data += struct.pack('<I', checksum)
 
-    metadata_address = 0x10000
+    metadata_address = int(sysbuild_kconfigs['installer_PARTITION_START'], 16) + int(sysbuild_kconfigs['installer_PARTITION_SIZE'], 16)
 
     ih = IntelHex()
     ih.frombytes(metadata_data, offset=metadata_address)
