@@ -1,0 +1,18 @@
+config BLAH1
+	hex "Alternative flash start address (DO NOT ALTER)"
+	default 0x0
+
+config BLAH2
+	hex "Alternative flash size (DO NOT ALTER)"
+	default 0x0
+
+config BLAH3
+	bool "Use alternative flash parameters (DO NOT ALTER)"
+
+config FLASH_LOAD_OFFSET
+	default BLAH1 if BLAH3
+
+config FLASH_LOAD_SIZE
+	default BLAH2 if BLAH3
+
+source "Kconfig.zephyr"
