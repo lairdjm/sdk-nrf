@@ -17,6 +17,6 @@ set(gen_dir ${ZEPHYR_BINARY_DIR}/include/generated/)
 
   generate_inc_file_for_target(
     app
-    /tmp/lol.bin
-    ${gen_dir}/lol.inc
+    /tmp/dummyinput.bin
+    ${gen_dir}/dummyinput.inc
     )

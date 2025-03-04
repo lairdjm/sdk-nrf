@@ -13,31 +13,10 @@ config FLASH_SIZE
 	default 0x100000 if SOC_SERIES_NRF53X
 	default 0x150000 if SOC_SERIES_NRF54LX
 
-config MCUBOOT_SIZE
-	hex "Size of MCUboot"
-	default 0x8000
-	help
-	  Specifies the size of the MCUboot partition, set to 0x0 to disable
+choice BOOTLOADER
+        prompt "Bootloader selection"
 
-config FILE_SYSTEM_SIZE
-	hex "Size of file system"
-	default 0x8000
-	help
-	  Specifies the size of the file system partition, set to 0x0 to disable
-
-config FIRMWARE_LOADER_SIZE
-	hex "Size of firmware loader" if MCUBOOT_SIZE > 0x0
-	default 0x0 if MCUBOOT_SIZE = 0x0
-	default 0x8000
-	help
-	  Specifies the size of the firmware loader partition, set to 0x0 to disable
-
-config METADATA_SIZE
-	hex
-	default 0x200 if MCUBOOT_SIZE > 0x0 || FIRMWARE_LOADER_SIZE > 0x0
-	default 0x0
-	help
-	  Specifies the size of the metadata partition, set to 0x0 to disable
+endchoice
 
 choice SOFTDEVICE_SELECTION
 	prompt "Softdevice selection"
@@ -61,9 +40,37 @@ config SOFTDEVICE_SIZE
 	help
 	  Specifies the size of the softdevice partition, set to 0x0 to disable
 
+config MCUBOOT_SIZE
+	hex "Size of MCUboot" if BOOTLOADER_MCUBOOT
+	range 0x4000 0x80000 if BOOTLOADER_MCUBOOT
+	default 0x8000 if BOOTLOADER_MCUBOOT
+	default 0x0
+	help
+	  Specifies the size of the MCUboot partition
+
+config FILE_SYSTEM_SIZE
+	hex "Size of file system"
+	default 0x8000
+	help
+	  Specifies the size of the file system partition, set to 0x0 to disable
+
+config FIRMWARE_LOADER_SIZE
+	hex "Size of firmware loader" if BOOTLOADER_MCUBOOT
+	default 0x8000 if BOOTLOADER_MCUBOOT
+	default 0x0
+	help
+	  Specifies the size of the firmware loader partition, set to 0x0 to disable
+
+config METADATA_SIZE
+	hex
+	default 0x200
+	help
+	  Specifies the size of the metadata partition
+
 config INSTALLER_SIZE
 	hex
-	default 0x8000 if FIRMWARE_LOADER_SIZE > 0x0
+#	default 0x8000 if FIRMWARE_LOADER_SIZE > 0x0
+	default 0x8000 if BOOTLOADER_MCUBOOT
 	default 0x0
 	help
 	  Specifies the size of the installer image, set to 0x0 to disable

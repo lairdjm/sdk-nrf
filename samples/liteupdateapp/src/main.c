@@ -25,7 +25,7 @@ struct image_data_array {
 };
 
 static const uint8_t test_data[] = {
-#include "lol.inc"
+#include "dummyinput.inc"
 };
 
 static const struct image_data_array *lol = (struct image_data_array *)test_data;
