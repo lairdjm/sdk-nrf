@@ -41,7 +41,14 @@ config SOFTDEVICE_SIZE
 	default 0x8000 if SOFTDEVICE_S140
 	default 0x0
 	help
-	  Specifies the size of the softdevice partition, set to 0x0 to disable
+	  Specifies the size of the softdevice partition, set to 0x0 to disable.
+
+config SOFTDEVICE_FILE
+	string
+	default "some/path/one" if SOFTDEVICE_S112
+	default "another/path/here" if SOFTDEVICE_S140
+	help
+	  Specifies the patch to the softdevice hex file.
 
 config MCUBOOT_SIZE
 	hex "Size of MCUboot" if BOOTLOADER_MCUBOOT
@@ -49,26 +56,26 @@ config MCUBOOT_SIZE
 	default 0x8000 if BOOTLOADER_MCUBOOT
 	default 0x0
 	help
-	  Specifies the size of the MCUboot partition
+	  Specifies the size of the MCUboot partition.
 
 config FILE_SYSTEM_SIZE
 	hex "Size of file system"
 	default 0x8000
 	help
-	  Specifies the size of the file system partition, set to 0x0 to disable
+	  Specifies the size of the file system partition, set to 0x0 to disable.
 
 config FIRMWARE_LOADER_SIZE
 	hex "Size of firmware loader" if BOOTLOADER_MCUBOOT
 	default 0x8000 if BOOTLOADER_MCUBOOT
 	default 0x0
 	help
-	  Specifies the size of the firmware loader partition, set to 0x0 to disable
+	  Specifies the size of the firmware loader partition, set to 0x0 to disable.
 
 config METADATA_SIZE
 	hex
 	default 0x200
 	help
-	  Specifies the size of the metadata partition
+	  Specifies the size of the metadata partition.
 
 config INSTALLER_SIZE
 	hex
@@ -76,6 +83,6 @@ config INSTALLER_SIZE
 	default 0x8000 if BOOTLOADER_MCUBOOT
 	default 0x0
 	help
-	  Specifies the size of the installer image, set to 0x0 to disable
+	  Specifies the size of the installer image, set to 0x0 to disable.
 
 endmenu

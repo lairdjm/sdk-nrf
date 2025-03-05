@@ -33,3 +33,6 @@ foreach(loopkeytype ${keytypes})
     set_config_bool(${ZCMAKE_APPLICATION} ${loopkeytype} n)
   endif()
 endforeach()
+
+# todo: entrance
+set_config_bool(${ZCMAKE_APPLICATION} CONFIG_BOOT_FIRMWARE_LOADER_NO_APPLICATION y)

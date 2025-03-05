@@ -14,5 +14,3 @@ config FLASH_LOAD_OFFSET
 
 config FLASH_LOAD_SIZE
 	default BLAH2 if BLAH3
-
-source "Kconfig.zephyr"

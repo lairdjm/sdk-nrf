@@ -140,5 +140,6 @@ rsource "lib/Kconfig"
 rsource "drivers/Kconfig"
 rsource "ext/Kconfig"
 rsource "tests/Kconfig"
+rsource "samples/liteupdateapp/Kconfig.nrf"
 
 endmenu

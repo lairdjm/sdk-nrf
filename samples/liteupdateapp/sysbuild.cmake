@@ -32,12 +32,40 @@ if(mcuboot_partition_size GREATER "0")
     math(EXPR flash_size_remaining "${flash_size_remaining} - ${firmware_loader_partition_size}")
     math(EXPR firmware_loader_partition_start "${flash_size_remaining} - ${firmware_loader_partition_size}")
     list(APPEND areas firmware_loader)
+
+    ExternalZephyrProject_Add(
+      APPLICATION firmware_loader
+      SOURCE_DIR ${ZEPHYR_BASE}/samples/hello_world
+    )
+
+    # Add Zephyr's main image configuration script to configure MCUboot parameters
+    get_property(tmp_conf_scripts TARGET firmware_loader PROPERTY IMAGE_CONF_SCRIPT)
+    set(default_main_script "${CMAKE_SOURCE_DIR}/image_configurations/MAIN_image_default.cmake")
+
+    if(NOT default_main_script IN_LIST tmp_conf_scripts)
+      list(APPEND tmp_conf_scripts ${default_main_script})
+      set_target_properties(firmware_loader PROPERTIES IMAGE_CONF_SCRIPT "${tmp_conf_scripts}")
+    endif()
+
+#size
+math(EXPR tmp_a "${firmware_loader_partition_start}" OUTPUT_FORMAT HEXADECIMAL)
+math(EXPR tmp_b "${firmware_loader_partition_size}" OUTPUT_FORMAT HEXADECIMAL)
+    set_config_bool(firmware_loader CONFIG_BLAH3 y)
+    set_config_int(firmware_loader CONFIG_BLAH1 ${tmp_a})
+    set_config_int(firmware_loader CONFIG_BLAH2 ${tmp_b})
   endif()
 
   # MCUboot present
   math(EXPR flash_size_remaining "${flash_size_remaining} - ${mcuboot_partition_size}")
   set(mcuboot_partition_start 0)
   list(APPEND areas mcuboot)
+
+#size
+math(EXPR tmp_a "${mcuboot_partition_start}" OUTPUT_FORMAT HEXADECIMAL)
+math(EXPR tmp_b "${mcuboot_partition_size}" OUTPUT_FORMAT HEXADECIMAL)
+  set_config_bool(mcuboot CONFIG_BLAH3 y)
+  set_config_int(mcuboot CONFIG_BLAH1 ${tmp_a})
+  set_config_int(mcuboot CONFIG_BLAH2 ${tmp_b})
 endif()
 
 set(app_partition_start ${mcuboot_partition_size})
