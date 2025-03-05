@@ -804,5 +804,6 @@ include(${CMAKE_CURRENT_LIST_DIR}/secureboot.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/mcuboot.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/suit.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/sdp.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/liteinstall.cmake)
 
 store_ncs_vars()
